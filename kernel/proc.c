@@ -712,7 +712,7 @@ ps_listinfo(uint64 plist, int lim)
 
   int total_proc = 0;
   int written = 0;
-  struct proc* p;
+  struct proc *p;
   struct procinfo pi;
   struct proc *currproc = myproc();
   acquire(&wait_lock);
@@ -723,13 +723,14 @@ ps_listinfo(uint64 plist, int lim)
       total_proc++;
 
       if (written < lim) {
-        pi.pid  = p->pid;
+        pi.pid = p->pid;
         pi.state = p->state;
         safestrcpy(pi.name, p->name, sizeof(pi.name));
         pi.ppid = p->parent ? p->parent->pid : 0;
         release(&p->lock);
         uint64 dst = plist + (uint64)written * sizeof(struct procinfo);
-        if (copyout(currproc->pagetable, currproc->sz, dst, (char *)&pi, sizeof(pi)) < 0) {
+        if (copyout(currproc->pagetable, currproc->sz, dst, (char *)&pi,
+                    sizeof(pi)) < 0) {
           release(&wait_lock);
           return -1;
         }
