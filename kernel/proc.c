@@ -610,6 +610,9 @@ kkill(int pid)
     acquire(&p->lock);
     if (p->pid == pid) {
       p->killed = 1;
+      // Cancel a prepared sleep too: kill may arrive before sleep()
+      // has changed the process state to SLEEPING.
+      p->chan = 0;
       if (p->state == SLEEPING) {
         // Wake process from sleep().
         p->state = RUNNABLE;
