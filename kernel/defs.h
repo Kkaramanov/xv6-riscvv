@@ -191,7 +191,7 @@ int             mutexunlock(struct sleeplock *);
 
 // mutex debug trace
 #ifndef MUTEX_DEBUG
-#define MUTEX_DEBUG 1
+#define MUTEX_DEBUG 0
 #endif
 #if MUTEX_DEBUG
 #define MTRACE(...) printk(__VA_ARGS__)

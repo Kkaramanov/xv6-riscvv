@@ -22,10 +22,10 @@ void putNumber(int n) {
     }
 }
 
-void printArgs(int argc, char* argv[], int mutex) {
+void printArgs(int argc, char* argv[], int m) {
     int pid = getpid();
     for (int i = 0; i < argc; i++) {
-        if (mutex_lock(mutex) < 0) {
+        if (mutex_lock(m) < 0) {
             printf("Ошибка захвата мьютекса\n");
             exit(1);
         }
@@ -39,15 +39,16 @@ void printArgs(int argc, char* argv[], int mutex) {
         }
         putString("'\n");
 
-        mutex_unlock(mutex);
+        mutex_unlock(m);
     }
 }
 
 int main(int argc, char* argv[]) {
-    printf("--- Синхронизированный вывод ---\n");
+    printf("\n--- Синхронизированный вывод ---\n");
+    printf("Родитель pid=%d запущен\n\n", getpid());
 
-    int mutex = mutex();
-    if (mutex < 0) {
+    int m = mutex();
+    if (m < 0) {
         printf("Не удалось создать mutex\n");
         exit(1);
     }
@@ -59,14 +60,14 @@ int main(int argc, char* argv[]) {
     }
 
     if (pid == 0) {
-        printArgs(argc, argv, mutex);
+        printArgs(argc, argv, m);
         exit(0);
     }
 
-    printArgs(argc, argv, mutex);
+    printArgs(argc, argv, m);
     
     wait(0);
-    close(mutex);
+    close(m);
 
     printf("\n--- Конец ---\n");
     exit(0);

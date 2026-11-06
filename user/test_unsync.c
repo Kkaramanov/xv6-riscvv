@@ -37,7 +37,8 @@ void printArgs(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-    printf("--- Несинхронизированный вывод ---\n");
+    printf("\n--- Несинхронизированный вывод ---\n");
+    printf("Родитель pid=%d запущен\n\n", getpid());
 
     int pid = fork();
     if (pid < 0) {

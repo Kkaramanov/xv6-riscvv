@@ -62,7 +62,10 @@ void
 fileclose(struct file *f)
 {
   struct file ff;
-  int pid = myproc()->pid;
+
+  #if MUTEX_DEBUG
+    int pid = myproc()->pid;
+  #endif
 
   if (f->type == FD_MUTEX) {
     MTRACE("mutex: pid=%d m=%p fileclose (pre-unlock)\n", pid, f->mutex);
