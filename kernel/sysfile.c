@@ -528,3 +528,46 @@ sys_pipe(void)
   }
   return 0;
 }
+
+// Creating a mutex
+uint64
+sys_mutex(void)
+{
+  struct file *f;
+  int fd;
+
+  if(mutexalloc(&f) < 0)
+    return -1;
+
+  if((fd = fdalloc(f)) < 0){
+    fileclose(f);
+    return -1;
+  }
+
+  return fd;
+}
+
+// Acquiring a mutex via a descriptor
+uint64
+sys_mutex_lock(void)
+{
+  int fd;
+  struct file *f;
+
+  if(argfd(0, &fd, &f) < 0 || f->type != FD_MUTEX)
+    return -1;
+  return mutexlock(f->mutex);
+}
+
+// Releasing the mutex via the descriptor
+uint64
+sys_mutex_unlock(void)
+{
+  int fd;
+  struct file *f;
+
+  if(argfd(0, &fd, &f) < 0 || f->type != FD_MUTEX)
+    return -1;
+
+  return mutexunlock(f->mutex);
+}
