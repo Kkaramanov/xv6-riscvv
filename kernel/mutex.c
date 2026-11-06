@@ -8,17 +8,6 @@
 #include "sleeplock.h"
 #include "file.h"
 
-// Override with -DMUTEX_DEBUG=0 for uninterrupted user console output.
-#ifndef MUTEX_DEBUG
-#define MUTEX_DEBUG 1
-#endif
-
-#if MUTEX_DEBUG
-#define MTRACE(...) printk(__VA_ARGS__)
-#else
-#define MTRACE(...) ((void)0)
-#endif
-
 int
 mutexalloc(struct file **fp)
 {

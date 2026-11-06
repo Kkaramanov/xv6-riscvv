@@ -189,5 +189,15 @@ void            mutexclose(struct sleeplock *);
 int             mutexlock(struct sleeplock *);
 int             mutexunlock(struct sleeplock *);
 
+// mutex debug trace
+#ifndef MUTEX_DEBUG
+#define MUTEX_DEBUG 1
+#endif
+#if MUTEX_DEBUG
+#define MTRACE(...) printk(__VA_ARGS__)
+#else
+#define MTRACE(...) ((void)0)
+#endif
+
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
