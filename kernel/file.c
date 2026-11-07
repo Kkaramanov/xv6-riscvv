@@ -51,6 +51,8 @@ filedup(struct file *f)
   if (f->ref < 1)
     panic("filedup");
   f->ref++;
+  if (f->type == FD_MUTEX)
+    MTRACE("mutex: pid=%d m=%p filedup ref=%d\n", myproc()->pid, f->mutex, f->ref);
   release(&ftable.lock);
   return f;
 }
@@ -61,10 +63,21 @@ fileclose(struct file *f)
 {
   struct file ff;
 
+  #if MUTEX_DEBUG
+    int pid = myproc()->pid;
+  #endif
+
+  if (f->type == FD_MUTEX) {
+    MTRACE("mutex: pid=%d m=%p fileclose (pre-unlock)\n", pid, f->mutex);
+    mutexunlock(f->mutex);
+  }
+
   acquire(&ftable.lock);
   if (f->ref < 1)
     panic("fileclose");
   if (--f->ref > 0) {
+    if (f->type == FD_MUTEX)
+      MTRACE("mutex: pid=%d m=%p fileclose ref=%d\n", pid, f->mutex, f->ref);
     release(&ftable.lock);
     return;
   }
@@ -79,6 +92,9 @@ fileclose(struct file *f)
     begin_op();
     iput(ff.ip);
     end_op();
+  } else if (ff.type == FD_MUTEX) {
+    MTRACE("mutex: pid=%d m=%p fileclose (last ref)\n", pid, ff.mutex);
+    mutexclose(ff.mutex);
   }
 }
 
@@ -108,6 +124,10 @@ fileread(struct file *f, uint64 addr, int n)
 {
   int r = 0;
 
+  if (f->type == FD_MUTEX) {
+    return -1;
+  }
+
   if (f->readable == 0 || n < 0)
     return -1;
 
@@ -135,6 +155,10 @@ int
 filewrite(struct file *f, uint64 addr, int n)
 {
   int r, ret = 0;
+
+  if (f->type == FD_MUTEX) {
+    return -1;
+  }
 
   if (f->writable == 0 || n < 0)
     return -1;
