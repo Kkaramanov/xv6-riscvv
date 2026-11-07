@@ -77,14 +77,7 @@ mutexlock(struct sleeplock *m)
 
     // Register before releasing the state lock to avoid lost wakeups.
     sleep_prepare(m);
-    // kill may have happened before sleep_prepare registered the channel.
-    if (killed(p)) {
-      acquire(&p->lock);
-      p->chan = 0;
-      release(&p->lock);
-      release(&m->lk);
-      return -1;
-    }
+
     release(&m->lk);
 
     MTRACE("mutex: pid=%d m=%p wait\n", p->pid, m);
