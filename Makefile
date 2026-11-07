@@ -153,6 +153,8 @@ UPROGS=\
 	$U/_sync\
 	$U/_ps\
 	$U/_mutexcheck\
+	$U/_test_unsync\
+	$U/_test_sync\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
